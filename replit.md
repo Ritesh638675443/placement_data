@@ -1,44 +1,47 @@
-# [Project name]
+# Industrial Engineering CGPA Portal
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A Streamlit portal where Industrial Engineering students look up their name by registration number and submit their CGPA up to the 3rd semester, while admins review and delete submissions.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `streamlit run app.py --server.port 5000` — run the portal locally
+- `streamlit run app.py --server.port 5000 --server.address 0.0.0.0 --server.headless true` — run it for the Replit preview/deployment
+- `cgpa_submissions.csv` — locally stored submission data
+- Admin login: username `admin`, password `admin123`
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Python 3.13
+- Streamlit
+- Pandas
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `app.py` — Streamlit UI, CSV persistence, student lookup, admin login, sorting, download, and deletion
+- `students.csv` — supplied department roster
+- `cgpa_submissions.csv` — submission storage file, created with headers
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The roster is a read-only CSV so registration numbers and names can be updated without changing application logic.
+- Each CGPA submission gets its own ID and timestamp, so repeat submissions are preserved and admins can delete one exact entry.
+- Admin access is kept in a separate tab and only the admin session displays submission data.
+- The app uses local CSV storage to keep the deployment simple and dependency-light.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Students can search by registration number without creating an account.
+- A matched student sees a welcome message and can submit a CGPA from 0.00 to 10.00.
+- Admins can sign in, filter records, review all entries sorted by registration number, download CSV, and delete selected submissions.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Keep the interface simple and easy to deploy with Streamlit.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The admin password is intentionally the requested default `admin123`; change it in `app.py` before sharing the deployed app publicly.
+- Local CSV storage is appropriate for a lightweight deployment; a database or shared storage service is needed for multi-instance production persistence.
 
 ## Pointers
 
