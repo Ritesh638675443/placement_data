@@ -177,6 +177,11 @@ def render_student_portal(students: pd.DataFrame) -> None:
             cgpa,
         )
         st.success("Your CGPA was submitted successfully.")
+        st.balloons()
+        st.success(
+            f"Thank you, {student['student_name'].title()}! "
+            "Your latest CGPA has been recorded."
+        )
         st.caption(
             "This is now your latest CGPA record. Any previous submission was replaced automatically."
         )
@@ -189,6 +194,20 @@ def render_student_portal(students: pd.DataFrame) -> None:
 def render_admin_portal() -> None:
     st.header("Admin access")
     st.write("Authorized staff can review and manage all submitted CGPA entries.")
+
+    if not st.session_state.get("admin_warning_acknowledged", False):
+        st.warning(
+            "Are you an authorized admin? This area contains confidential student CGPA records "
+            "and is only for department administrators."
+        )
+        if st.button(
+            "Okay, I am an authorized admin",
+            type="primary",
+            use_container_width=True,
+        ):
+            st.session_state.admin_warning_acknowledged = True
+            st.rerun()
+        return
 
     if not st.session_state.get("admin_authenticated", False):
         with st.form("admin_login_form"):
@@ -216,6 +235,7 @@ def render_admin_portal() -> None:
     with top_right:
         if st.button("Sign out", use_container_width=True):
             st.session_state.admin_authenticated = False
+            st.session_state.admin_warning_acknowledged = False
             st.rerun()
 
     if submissions.empty:
