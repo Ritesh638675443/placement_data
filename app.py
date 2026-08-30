@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import csv
 import os
 import uuid
 from datetime import datetime
@@ -44,7 +43,7 @@ def ensure_submissions_file() -> None:
 
 def load_submissions() -> pd.DataFrame:
     ensure_submissions_file()
-    return pd.read_csv(
+    submissions = pd.read_csv(
         SUBMISSIONS_FILE,
         dtype={
             "entry_id": "string",
@@ -54,6 +53,10 @@ def load_submissions() -> pd.DataFrame:
             "submitted_at": "string",
         },
     )
+    # Keep the newest row in case older data contains duplicate submissions.
+    return submissions.drop_duplicates(
+        subset=["registration_number"], keep="last"
+    ).reset_index(drop=True)
 
 
 def save_submissions(submissions: pd.DataFrame) -> None:
@@ -81,6 +84,9 @@ def reset_student_lookup() -> None:
 
 def submit_cgpa(registration_number: str, student_name: str, cgpa: float) -> None:
     submissions = load_submissions()
+    submissions = submissions[
+        submissions["registration_number"] != registration_number
+    ]
     new_entry = pd.DataFrame(
         [
             {
@@ -171,7 +177,9 @@ def render_student_portal(students: pd.DataFrame) -> None:
             cgpa,
         )
         st.success("Your CGPA was submitted successfully.")
-        st.caption("You can submit again whenever you need to update the record.")
+        st.caption(
+            "This is now your latest CGPA record. Any previous submission was replaced automatically."
+        )
 
     if st.button("Search another registration number"):
         reset_student_lookup()

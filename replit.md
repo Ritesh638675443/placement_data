@@ -24,7 +24,7 @@ A Streamlit portal where Industrial Engineering students look up their name by r
 ## Architecture decisions
 
 - The roster is a read-only CSV so registration numbers and names can be updated without changing application logic.
-- Each CGPA submission gets its own ID and timestamp, so repeat submissions are preserved and admins can delete one exact entry.
+- Each CGPA submission gets its own ID and timestamp, while a new submission replaces the student's previous record so admins see only the latest CGPA.
 - Admin access is kept in a separate tab and only the admin session displays submission data.
 - The app uses local CSV storage to keep the deployment simple and dependency-light.
 
